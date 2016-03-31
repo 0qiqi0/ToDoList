@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html ng-app="todoModule">
+<head>
+    <title>事件宝</title>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="../public/lib/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.css">
+</head>
+<body style="margin-top: 50px;" ng-controller="todoCtrl">
+<div class="container">
+    <div class="jumbotron text-center">
+        <h1><label class="label label-info">你有{{}}个待办事项</label></h1>
+    </div>
+    <div class="row">
+        <div class="col-md-offset-4 col-md-4">
+            <div class="checkbox" ng-repeat="todo in todos">
+                <label>
+                    <input type="checkbox"> {{todo.text}}<span class="glyphicon glyphicon-minus" ng-click="delete(todo.id)"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-offset-2 col-md-8 text-center" >
+            <form >
+                <div class="form-group">
+                    <label for="text">新的事项</label>
+                    <input type="text" id="text" class="form-control" ng-model="todo.text"/>
+
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary" ng-click="addTodo()">增加</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+<script src="/lib/jquery/dist/jquery.js"></script>
+<script src="/lib/bootstrap/dist/js/bootstrap.js"></script>
+<script src="/lib/angular/angular.js"></script>
+<script>
+    angular.module('todoModule',[]);
+    angular.module('todoModule').factory('todoService',function($http){
+       return {
+            list:function(){
+                return $http.get('/todos');
+            },
+           add:function(data){
+               return $http.post('/todos',data);
+           },
+           delete:function(id){
+               return  $http.delete('/todos/'+id)
+           }
+       }
+    });
+    angular.module('todoModule').controller('todoCtrl', function ($scope,todoService) {
+        //请求服务器 所有的代办事项，返回一个promise，进而调用promise 的方法 success方法
+        todoService.list().success(function(todos){
+            $scope.todos=todos;
+        })
+        $scope.todo={};
+        $scope.addTodo=function(){
+            todoService.add($scope.todo).success(function(todo){
+                $scope.todos.push(todo);
+            });
+        }
+        $scope.delete=function(id){
+            todoService.delete(id).success(function(data){
+                $scope.todos=$scope.todos.filter(function(todo){
+                    return todo._id !=id;
+                })
+            })
+        }
+    });
+
+</script>
+</html>
