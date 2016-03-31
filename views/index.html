@@ -11,13 +11,14 @@
 <body style="margin-top: 50px;" ng-controller="todoCtrl">
 <div class="container">
     <div class="jumbotron text-center">
-        <h1><label class="label label-info">你有{{}}个待办事项</label></h1>
+        <h1><label class="label label-info">你有{{todos.length}}个待办事项</label></h1>
     </div>
+
     <div class="row">
         <div class="col-md-offset-4 col-md-4">
             <div class="checkbox" ng-repeat="todo in todos">
                 <label>
-                    <input type="checkbox"> {{todo.text}}<span class="glyphicon glyphicon-minus" ng-click="delete(todo.id)"></span>
+                    <input type="checkbox" ng-click="isSelected(todo._id)"> {{todo.text}}<span class="glyphicon glyphicon-minus" ng-click="delete(todo._id)"></span>
                 </label>
             </div>
         </div>
@@ -33,6 +34,7 @@
                 </div>
                 <div class="form-group">
                     <button class="btn btn-primary" ng-click="addTodo()">增加</button>
+                    <button class="btn btn-primary" ng-click="batcchDelete()">批量删除</button>
                 </div>
             </form>
         </div>
@@ -66,6 +68,7 @@
         $scope.addTodo=function(){
             todoService.add($scope.todo).success(function(todo){
                 $scope.todos.push(todo);
+                $scope.todo={};
             });
         }
         $scope.delete=function(id){
@@ -73,6 +76,32 @@
                 $scope.todos=$scope.todos.filter(function(todo){
                     return todo._id !=id;
                 })
+            })
+        }
+
+
+        $scope.batchDelete = function () {
+            $scope.loading = true;
+            var selectedIds = [];
+            $scope.todos.forEach(function(todo){
+                if(todo.checked){
+                    selectedIds.push(todo._id);
+                }
+            });
+            todoService.batchDelete(selectedIds).success(function () {
+                $scope.todos = $scope.todos.filter(function (todo) {
+                    return selectedIds.indexOf(todo._id) == -1;
+                });
+                $scope.loading = false;
+            });
+        }
+        $scope.selectAll = function(){
+            var all = $scope.todos.length;
+            var length = $scope.todos.filter(function(todo){
+                return todo.checked;
+            }).length;
+            $scope.todos.forEach(function(todo){
+                todo.checked = (all != length);
             })
         }
     });

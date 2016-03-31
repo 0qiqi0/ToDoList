@@ -1,13 +1,13 @@
 var express = require('express');
 var router = express.Router();
-var todoModel=require('../model/index.js')
+var todoModel=require('../model')
 
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 router.route('/todos').get(function(req, res, next) {
   todoModel.find({},function(err,todos){
-    console.log(req)
+    //console.log(req);
     if(err){
       console.log(err);
       res.send({code:0,msg:'查询错误'});
@@ -18,6 +18,7 @@ router.route('/todos').get(function(req, res, next) {
   });
 }).post(function(req,res){
   todoModel.create(req.body,function(err,todo){
+    console.log(todo)
     //todo是保存后的对象，发送个诶客户端
     if(err){
       res.send({code:0,msg:'添加错误'});
