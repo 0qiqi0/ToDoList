@@ -12,8 +12,8 @@ var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'html');
-app.engine('html',require('ejs').__express);
+app.set('view engine', 'html'); //以前是：app.set('view engine', 'html');
+app.engine('html',require('ejs').__express);//require('ejs').__express是ejs提供的用来渲染html模板的函数
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
