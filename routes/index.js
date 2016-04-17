@@ -19,7 +19,7 @@ router.route('/todos').get(function(req, res, next) {
   });
 }).post(function(req,res){
     todoModel.create(req.body,function(err,todo){
-    console.log(todo)
+            console.log(todo)
     //todo是保存成功后的对象，返回给客户端
     if(err){
       res.send({code:0,msg:'添加错误'});
@@ -41,14 +41,16 @@ router.route('/todos/:_id').delete(function(req,res){
   })
 })
 
-router.route('/todos/delete').delete(function(req,res){
+router.route('/todos/delete').post(function(req,res){
   var ids=req.body;
   todoModel.remove({_id:{$in:ids}},function(err,result){
     if (err) {
-       res.send({code: 0, msg: '删除失败!'});
+        console.log('批量删除失败');
+       res.send({code:0, msg:'删除失败!'});
     } else {
+        console.log(result);
       //把保存到数据库中之后的对象发送给客户端
-       res.send({code: 1, msg: '删除成功!'});
+       res.send({code:1, msg:'删除成功!'});
     }
   });
 })

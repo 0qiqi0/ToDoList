@@ -20,7 +20,7 @@
             <button class="btn btn-success" ng-click="selectAll()">全选</button>
             <div class="checkbox" ng-repeat="todo in todos">
                 <label>
-                    <input type="checkbox" ng-checked="checked"  ng-click="isSelected(todo._id)"> {{todo.text}}<span class="glyphicon glyphicon-minus" ng-click="delete(todo._id)"></span>
+                    <input type="checkbox" ng-checked="checked" ng-click="isSelected(todo._id)"> {{todo.text}}<span class="glyphicon glyphicon-minus" ng-click="delete(todo._id)"></span>
                 </label>
             </div>
         </div>
@@ -36,7 +36,7 @@
                 </div>
                 <div class="form-group">
                     <button class="btn btn-primary" ng-click="addTodo()">增加</button>
-                    <button class="btn btn-primary" ng-click="batcchDelete()">批量删除</button>
+                    <button class="btn btn-primary" ng-click="batchDelete()">批量删除</button>
                 </div>
             </form>
         </div>
@@ -61,15 +61,17 @@
                return  $http.delete('/todos/'+id)
            },
             batchDelete: function (data) {
-                return $http.delete('/todos/delete', data);
+                return $http.delete('/todos/delete',data);
             }
        }
     });
     angular.module('todoModule').controller('todoCtrl', function ($scope,todoService) {
         //请求服务器 所有的代办事项，返回一个promise，进而调用promise 的方法 success方法
         todoService.list().success(function(todos){
+            console.log(todos)
             $scope.todos = todos;
         })
+
         $scope.todo = {};
         $scope.selected=[];
         $scope.checked = 0;
@@ -81,8 +83,9 @@
                 $scope.todo = {};
             });
         }
+
         $scope.delete = function(id){
-            todoService.delete(id).success(function(data){
+            todoService.delete(id).success(function(){
                 $scope.todos = $scope.todos.filter(function(todo){
                     return todo._id !=id;
                 })
@@ -97,20 +100,22 @@
                 $scope.selected.push(id);
             }
         }
-
-        $scope.batchDelete = function () {
+//isSelected  batchDelete相关联
+        $scope.batchDelete = function(){
             todoService.batchDelete($scope.selected).success(function(){
+                console.log('批量删除成功');
                 $scope.todos=$scope.todos.filter(function(todo){
                     return $scope.selected.indexOf(todo._id) == -1;
                 })
+                $scope.selected=[];
             })
         }
         $scope.selectAll = function(){
             $scope.checked = $scope.checked?0:1;
-            $scope.checked.length = 0;
-            if($scope.checked){
+            $scope.checked.length = 0; //清空数组
+            if($scope.checked){  //判断是不是全选
                 $scope.todos.forEach(function(todo){
-                    $scope.selected.push(todo._id);
+                    $scope.selected.push(todo._id); //全选的话把id全填进去
                 })
             }
         }
